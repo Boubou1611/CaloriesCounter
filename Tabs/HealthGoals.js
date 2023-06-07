@@ -1,16 +1,35 @@
 import { StatusBar } from 'expo-status-bar';
-import { View, TextInput, Text, Switch, Button, Alert, StyleSheet  } from 'react-native';
+import { View, TextInput, Text, Switch, Button, Alert, StyleSheet, picker  } from 'react-native';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Checkbox from "expo-checkbox";
 import React, { useState } from "react";
 
+
 export default function App() {
   const [name, setName] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [gender, setGender] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
-  const [numberOfPets, setNumberOfPets] = useState("");
   const [isDeveloper, setIsDeveloper] = useState(false);
   const [isAgreed, setIsAgreed] = useState(false);
   const [age, setAge] = useState("");
+
+  const genderList = [
+    {
+      label: "Male",
+      value: "male",
+    },
+    {
+      label: "Female",
+      value: "female",
+    },
+    {
+      label: "Others",
+      value: "others",
+    },
+  ];
+  
 const handleNameChange = (text) => {
   setName(text);
 };
@@ -21,16 +40,22 @@ const handleDateOfBirthChange = (event, selectedDate) => {
   calculateAge(currentDate);
 };
 
-const handleNumberOfPetsChange = (text) => {
-  setNumberOfPets(text);
+const handleHeightChange = (text) => {
+  setHeight(text);
 };
-
+const handleWeightChange = (text) => {
+  setWeight(text);
+};
 const handleDeveloperSwitchChange = (value) => {
   setIsDeveloper(value);
 };
 
 const handleAgreedCheckboxChange = (value) => {
   setIsAgreed(value);
+};
+
+const handleGenderChange = (value) => {
+  setGender(value);
 };
 
 const calculateAge = (birthDate) => {
@@ -72,16 +97,24 @@ return (
       maxLength={30}
     />
     <DateTimePicker
-      value={dateOfBirth}
-      mode="date"
-      onChange={handleDateOfBirthChange}
-      maximumDate={new Date()}
+        value={dateOfBirth}
+        mode="date"
+        onChange={handleDateOfBirthChange}
+        maximumDate={new Date()}
+      />
+    <TextInput
+      style={styles.input}
+      placeholder="Height"
+      onChangeText={handleHeightChange}
+      value={height}
+      keyboardType="numeric"
+      maxLength={2}
     />
     <TextInput
       style={styles.input}
-      placeholder="Number of Pets"
-      onChangeText={handleNumberOfPetsChange}
-      value={numberOfPets}
+      placeholder="Weight"
+      onChangeText={handleWeightChange}
+      value={weight}
       keyboardType="numeric"
       maxLength={2}
     />
