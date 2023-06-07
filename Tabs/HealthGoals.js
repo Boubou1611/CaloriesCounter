@@ -3,33 +3,23 @@ import { View, TextInput, Text, Switch, Button, Alert, StyleSheet, picker  } fro
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Checkbox from "expo-checkbox";
 import React, { useState } from "react";
-
+import DropDownPicker from "react-native-dropdown-picker";
 
 export default function App() {
   const [name, setName] = useState("");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
-  const [gender, setGender] = useState("");
+  
+  const [gender, setGender] = useState([
+    { label: "Male", value: "male" },
+    { label: "Female", value: "female" },
+    { label: "Other", value: "neutral" },
+  ]);
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
   const [isDeveloper, setIsDeveloper] = useState(false);
   const [isAgreed, setIsAgreed] = useState(false);
   const [age, setAge] = useState("");
 
-  const genderList = [
-    {
-      label: "Male",
-      value: "male",
-    },
-    {
-      label: "Female",
-      value: "female",
-    },
-    {
-      label: "Others",
-      value: "others",
-    },
-  ];
-  
 const handleNameChange = (text) => {
   setName(text);
 };
