@@ -27,16 +27,7 @@ const PickerGender = () => {
             <Picker.Item label="Female" value="female" />
             <Picker.Item label="oOther" value="other" />
           </Picker>
-      <Text>Sélectionnez votre genre :</Text>
-      <Picker
-        selectedValue={selectedGender}
-        onValueChange={handleGenderChange}
-      >
-        <Picker.Item label="Homme" value="Male" />
-        <Picker.Item label="Femme" value="Female" />
-        <Picker.Item label="Autre" value="Other" />
-      </Picker>
-      <Text>Votre genre : {selectedGender}</Text>
+
     </View>
   );
 };
@@ -52,3 +43,15 @@ itemView: {
   },
 });
 export default PickerGender;
+
+
+// <Text>Sélectionnez votre genre :</Text>
+// <Picker
+//   selectedValue={selectedGender}
+//   onValueChange={handleGenderChange}
+// >
+//   <Picker.Item label="Homme" value="Male" />
+//   <Picker.Item label="Femme" value="Female" />
+//   <Picker.Item label="Autre" value="Other" />
+// </Picker>
+// <Text>Votre genre : {selectedGender}</Text>
