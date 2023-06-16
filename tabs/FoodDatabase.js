@@ -81,6 +81,7 @@ export default function TabTwoScreen(navigation) {
       );
 
       const itemsList = response.data.branded;
+      console.log(itemsList);
       const searchResults = itemsList.map((item) => ({
         _id: item["nix_item_id"],
         name: item["food_name"],
@@ -268,7 +269,7 @@ const Styles = StyleSheet.create({
     marginVertical: 10,
   },
   picture: {
-    borderRadius: "25px",
+    borderRadius: 25,
     width: 100,
     height: 100,
     resizeMode: "center",
