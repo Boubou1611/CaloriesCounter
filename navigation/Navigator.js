@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View, Image, TouchableOpaicty } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from "react-native";
 
 import Health from "../tabs/HealthGoals";
@@ -8,6 +9,30 @@ import Food from "../tabs/FoodDatabase";
 import Meal from "../tabs/MealPlanning";
 import { NavigationContainer } from "@react-navigation/native";
 import { shadow } from "react-native-paper";
+
+export default function Navigation() {
+  return (
+    <NavigationContainer>
+      <RootNavigator />
+    </NavigationContainer>
+  );
+}
+
+const Stack = createNativeStackNavigator();
+
+function RootNavigator() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Root"
+        component={BottomTabNavigator}
+        options={{
+          headerShown: false,
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
 
 const Tab = createBottomTabNavigator();
 
@@ -45,7 +70,7 @@ const getTabBarOptions = (icon, label) => ({
 
 const BottomTabNavigator = () => {
   return (
-    <NavigationContainer>
+    <>
       <StatusBar barStyle="light-content" />
       <Tab.Navigator
         screenOptions={{
@@ -79,10 +104,10 @@ const BottomTabNavigator = () => {
         <Tab.Screen
           name="Meal"
           component={Meal}
-          options={getTabBarOptions(require("../assets/clock.png"), "MEAL")}
+          options={getTabBarOptions(require("../assets/clock.png"), "PLANNING")}
         />
       </Tab.Navigator>
-    </NavigationContainer>
+    </>
   );
 };
 
@@ -98,5 +123,3 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
 });
-
-export default BottomTabNavigator;

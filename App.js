@@ -1,9 +1,9 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import BottomTabNavigator from "./navigation/BottomTabNavigator";
+import Navigation from "./navigation/Navigator";
 
 export default function App() {
-  return <BottomTabNavigator />;
+  return <Navigation />;
 }
 
 const styles = StyleSheet.create({

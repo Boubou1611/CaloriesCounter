@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import Picker from '@react-native-picker/picker'
+import React, { useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 
 const PickerGender = () => {
-    const [pickerSelectedValue, setPickerSelectedValue] = useState("");
-    const [gender, setGender] = useState([
+  const [pickerSelectedValue, setPickerSelectedValue] = useState("");
+  const [gender, setGender] = useState([
     { label: "Male", value: "male" },
     { label: "Female", value: "female" },
     { label: "Other", value: "other" },
@@ -16,23 +16,22 @@ const PickerGender = () => {
 
   return (
     <View>
-        <Picker
-            selectedValue={pickerSelectedValue}
-            onValueChange={(itemValue, itemIndex) =>
-              setPickerSelectedValue(itemValue)
-            }
-            style={{ height: "100%", width: "100%" }}
-          >
-            <Picker.Item label="Male" value="male" />
-            <Picker.Item label="Female" value="female" />
-            <Picker.Item label="oOther" value="other" />
-          </Picker>
-
+      <Picker
+        selectedValue={pickerSelectedValue}
+        onValueChange={(itemValue, itemIndex) =>
+          setPickerSelectedValue(itemValue)
+        }
+        style={{ height: "100%", width: "100%" }}
+      >
+        <Picker.Item label="Male" value="male" />
+        <Picker.Item label="Female" value="female" />
+        <Picker.Item label="Other" value="other" />
+      </Picker>
     </View>
   );
 };
 const Styles = StyleSheet.create({
-itemView: {
+  itemView: {
     borderRadius: "25px",
     overflow: "hidden",
     flexDirection: "row",
@@ -43,7 +42,6 @@ itemView: {
   },
 });
 export default PickerGender;
-
 
 // <Text>Sélectionnez votre genre :</Text>
 // <Picker

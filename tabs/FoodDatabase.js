@@ -1,24 +1,3 @@
-// import { StatusBar } from "expo-status-bar";
-// import { StyleSheet, Text, View } from "react-native";
-
-// export default function App() {
-//   return (
-//     <View style={styles.container}>
-//       <Text>C'est la FOODBase oue ouee</Text>
-//       <StatusBar style="auto" />
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: "#fff",
-//     alignItems: "center",
-//     justifyContent: "center",
-//   },
-// });
-
 import {
   StyleSheet,
   Text,
@@ -33,37 +12,54 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useIsFocused } from "@react-navigation/native";
+import DayName from "../functions/dayName";
+import { MealsWeek, Food } from "../class/mealClass";
 
-export default function TabTwoScreen(navigation) {
+export default function FoodDatabse({ navigation, route }) {
+  const [dayForUpdate, setDayForUpdate] = useState(() => {
+    if (route.params) {
+      return route.params.dayToUpdate;
+    } else {
+      return DayName();
+    }
+  });
+
   const [items, setItems] = useState();
   const [data, setData] = useState();
   const [selection, setSelection] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [isModalDisplay, setIsModalDisplay] = useState(false);
   const [pickerSelectedValue, setPickerSelectedValue] = useState("");
-  const [mealPlan, setMealPlan] = useState({
-    Breakfast: [],
-    Lunch: [],
-    Snack: [],
-    Dinner: [],
-  });
+  const [mealWeekPlan, setMealWeekPlan] = useState(new MealsWeek());
+  const isFocused = useIsFocused();
+
   useEffect(() => {
     const fetchData = async () => {
       //create variable mealPlan to check if mealPlan exist
-      const mealPlanStorage = await AsyncStorage.getItem("mealPlan");
-      console.log("TabTwoScreen L32 mealPlanStorage:", mealPlanStorage);
+      const mealPlanStorage = await AsyncStorage.getItem(
+        "mealsWeekPlanStorage"
+      );
 
       //create mealPlanStorage if not exist
       if (!mealPlanStorage) {
-        await AsyncStorage.setItem("mealPlan", JSON.stringify(mealPlan));
+        await AsyncStorage.setItem(
+          "mealsWeekPlanStorage",
+          JSON.stringify(mealWeekPlan)
+        );
       }
-      //   const jsonMealPlan = JSON.parse(mealPlan ?? "");
-      console.log("TabTwoScreen L37 jsonMealPlan:", mealPlan);
 
       setIsLoading(false);
+      setDayForUpdate(() => {
+        if (route.params) {
+          return route.params.dayToUpdate;
+        } else {
+          return DayName();
+        }
+      });
     };
     fetchData();
-  }, []);
+  }, [isFocused]);
 
   const SearchItem = async (item) => {
     console.log("functions/SearchItem L14 item:", item);
@@ -74,14 +70,13 @@ export default function TabTwoScreen(navigation) {
         `https://trackapi.nutritionix.com/v2/search/instant?query=${item}`,
         {
           headers: {
-            "x-app-id": "dae115c7",
-            "x-app-key": "0663d4c3b7c6f582574b174d80f0478e",
+            "x-app-id": "b9973180",
+            "x-app-key": "8465f81a70cc42f106e0aa2358d0d446",
           },
         }
       );
 
       const itemsList = response.data.branded;
-      console.log(itemsList);
       const searchResults = itemsList.map((item) => ({
         _id: item["nix_item_id"],
         name: item["food_name"],
@@ -93,9 +88,9 @@ export default function TabTwoScreen(navigation) {
       setData(searchResults);
       return response;
     } catch (error) {
-      alert(`functions/SearchItem L28 une erreur est survenue:${error}`);
+      alert(`Une erreur est survenue 🧘‍♀️`);
       console.log(
-        `functions/SearchItem L31 une erreur est survenue, error:${error}`
+        `functions/SearchItem L94 une erreur est survenue, error:${error}`
       );
     }
   };
@@ -106,7 +101,9 @@ export default function TabTwoScreen(navigation) {
       <View style={Styles.pictureCommentView}>
         {/* <Text style={Styles.idText}>id: {item._id}</Text> */}
         <Text style={Styles.itemNameText}>{item.name}</Text>
-        <Text style={Styles.commentText}>{item.calories} calories</Text>
+        <Text style={Styles.commentText}>
+          {Math.floor(item.calories * 10) / 10} calories
+        </Text>
       </View>
       <TouchableOpacity style={[Styles.addButton]} onPress={onPress}>
         <Text style={Styles.plusText}>+</Text>
@@ -122,39 +119,67 @@ export default function TabTwoScreen(navigation) {
           setIsModalDisplay(true);
           setSelection({
             ...selection,
-            selectionId: item._id,
+            _id: item._id,
+            name: item.name,
+            calories: item.calories,
           });
         }}
       />
     );
   };
 
-  const UpdateMealPlan = async (pickerSelectedValue, selection) => {
-    switch (pickerSelectedValue) {
-      case "Breakfast":
-        mealPlan.Breakfast.push(selection["selectionId"]);
-        break;
-      case "Lunch":
-        mealPlan.Lunch.push(selection["selectionId"]);
-        break;
-      case "Snack":
-        mealPlan.Snack.push(selection["selectionId"]);
-        break;
-      case "Dinner":
-        mealPlan.Dinner.push(selection["selectionId"]);
-        break;
+  //Functions
+  const UpdateMealPlan = async (
+    pickerSelectedValue,
+    selection,
+    dayForUpdate
+  ) => {
+    //read the week plan in local storage
+    const mealsWeekPlanStorage = await AsyncStorage.getItem(
+      "mealsWeekPlanStorage"
+    );
+    // transform the string to an object
+    const weekData = JSON.parse(mealsWeekPlanStorage ?? "");
+    console.log(`FoodDatabse L152 mealsWeekPlanStorage:`, mealsWeekPlanStorage);
+    //test if food _id exist for the day an the selected meal
+    if (
+      weekData.days[dayForUpdate][pickerSelectedValue].some(
+        (item) => item._id === selection._id
+      )
+    ) {
+      const foundObject = weekData.days[dayForUpdate][pickerSelectedValue].find(
+        (item) => item._id === selection._id
+      );
 
-      default:
-        break;
+      if (foundObject) {
+        //if exist add quantity
+        foundObject.quantity = parseInt(foundObject.quantity) + 1;
+      }
+    } else {
+      // create food object when doesn't exist
+      const food = new Food();
+      food._id = selection["_id"];
+      food.name = selection["name"];
+      food.calories = selection["calories"];
+      food.quantity = 1;
+      weekData.days[dayForUpdate][pickerSelectedValue].push(food);
     }
-    console.log("TabTwoScreen L134 mealPlan:", mealPlan);
-    await AsyncStorage.setItem("mealPlanStorage", JSON.stringify(mealPlan));
+    //write modification in local storage
+    await AsyncStorage.setItem(
+      "mealsWeekPlanStorage",
+      JSON.stringify(weekData)
+    );
+    //undisplay the modal
     setIsModalDisplay(false);
+    //reset selection stat
     setSelection();
+    //go to Meal Planning screen
+    navigation.navigate("Meal");
   };
+
   return (
     <View style={Styles.container}>
-      <Text style={[Styles.titleText]}>{JSON.stringify(selection)}</Text>
+      {/* <Text style={[Styles.titleText]}>{JSON.stringify(selection)}</Text> */}
 
       <View style={[Styles.searchView]}>
         <TextInput
@@ -197,15 +222,15 @@ export default function TabTwoScreen(navigation) {
             }
             style={{ height: "100%", width: "100%" }}
           >
-            <Picker.Item label="Breakfast" value="Breakfast" />
-            <Picker.Item label="Lunch" value="Lunch" />
-            <Picker.Item label="Snack" value="Snack" />
-            <Picker.Item label="Dinner" value="Dinner" />
+            <Picker.Item label="Breakfast" value="breakfast" />
+            <Picker.Item label="Lunch" value="lunch" />
+            <Picker.Item label="Snack" value="snack" />
+            <Picker.Item label="Dinner" value="dinner" />
           </Picker>
           <TouchableOpacity
             style={Styles.selectButton}
             onPress={() => {
-              UpdateMealPlan(pickerSelectedValue, selection);
+              UpdateMealPlan(pickerSelectedValue, selection, dayForUpdate);
             }}
           >
             <Text style={Styles.searchButtonText}>Valid choice</Text>
@@ -218,6 +243,7 @@ export default function TabTwoScreen(navigation) {
 
 const Styles = StyleSheet.create({
   container: {
+    paddingTop: 30,
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -254,7 +280,11 @@ const Styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
-  commentText: { fontSize: 12 },
+  commentText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "green",
+  },
   itemNameText: {
     fontSize: 16,
     fontWeight: "bold",
