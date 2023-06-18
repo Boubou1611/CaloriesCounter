@@ -4,7 +4,8 @@ import {
   Text,
   View,
   ScrollView,
-  ViewComponent,
+  Dimensions,
+  Image,
 } from "react-native";
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -17,22 +18,26 @@ export default function MealPlanning({ navigation }) {
     const { navigation, dayName, dayMeals } = props;
     return (
       <View style={[Styles.dayContainer, Styles.vertical]}>
-        <Text>{dayName.toUpperCase()}</Text>
-        <DayStat dayMeals={dayMeals} />
+        <View style={Styles.dayNameContainer}>
+          <Text style={Styles.dayName}>{dayName.toUpperCase()}</Text>
+          <DayStat dayMeals={dayMeals} />
+        </View>
         <View style={[Styles.dayContent]}>
           {Object.keys(dayMeals).map((meal, mealKey) => {
             return (
               <View style={[Styles.mealContainer]} key={mealKey}>
                 <View style={[Styles.mealContent]}>
                   <Text style={[Styles.mealText]}>
-                    {capitalizeFirstChar(meal)}
+                    {capitalizeFirstChar(meal)} :
                   </Text>
                   {dayMeals[meal].map((Food, key) => {
                     const food = {
                       foodId: Food._id,
+                      foodImage: Food.picture,
                       mealName: meal,
                       dayName: dayName,
                     };
+                    console.log("La nourriture : ", Food);
                     return (
                       <TouchableOpacity
                         onPress={() => {
@@ -41,14 +46,21 @@ export default function MealPlanning({ navigation }) {
                         }}
                         key={key + Food._id}
                       >
-                        <Text style={[Styles.foodText]} key={Food._id}>
-                          {Food.quantity +
-                            " X " +
-                            "(" +
-                            Food.calories +
-                            " cal) :" +
-                            Food.name}
-                        </Text>
+                        <View style={Styles.imageFoodContainer}>
+                          <Image
+                            style={Styles.picture}
+                            source={{ url: Food.picture }}
+                          />
+                          <View style={Styles.imageText}>
+                            <Text style={[Styles.foodText]} key={Food._id}>
+                              {Food.quantity +
+                                " X " +
+                                "(" +
+                                Food.calories +
+                                " cal)"}
+                            </Text>
+                          </View>
+                        </View>
                       </TouchableOpacity>
                     );
                   })}
@@ -59,7 +71,7 @@ export default function MealPlanning({ navigation }) {
           })}
 
           <TouchableOpacity
-            style={[Styles.touchContainer, Styles.horizontal]}
+            style={[Styles.addButton, Styles.horizontal]}
             onPress={() => {
               navigation.navigate("Food", {
                 dayToUpdate: dayName,
@@ -67,7 +79,7 @@ export default function MealPlanning({ navigation }) {
               });
             }}
           >
-            <Text style={Styles.idText}>Add</Text>
+            <Text style={Styles.plusText}>+</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -84,7 +96,7 @@ export default function MealPlanning({ navigation }) {
       });
     }
     return (
-      <Text>
+      <Text style={Styles.caloriesText}>
         {mealCalories + " "}
         Tot.Cal
       </Text>
@@ -141,6 +153,7 @@ export default function MealPlanning({ navigation }) {
   });
   const [isModalDisplay, setIsModalDisplay] = useState(false);
   const isFocused = useIsFocused();
+  const { width, height } = Dimensions.get("window");
   //functions
   const RemoveFood = async (mealWeekPlan, foodToRemove) => {
     //find object index of the _id food in mealWeekPlan
@@ -196,27 +209,28 @@ export default function MealPlanning({ navigation }) {
   }, [isFocused]);
 
   return (
-    <ScrollView bounces="true" style={Styles.scrollContainer}>
-      <View style={Styles.container}>
+    <View style={Styles.container}>
+      <ScrollView pagingEnabled horizontal style={{ width, height }}>
         {Object.keys(mealWeekPlan.days).map((day, key) => {
           return (
-            <Day
-              navigation={navigation}
-              dayName={day}
-              dayMeals={mealWeekPlan.days[day]}
-              key={key}
-            ></Day>
+            <View style={{ width, height }}>
+              <Day
+                navigation={navigation}
+                dayName={day}
+                dayMeals={mealWeekPlan.days[day]}
+              />
+            </View>
           );
         })}
-        {isModalDisplay ? (
-          <Modal
-            style={[Styles.modal]}
-            foodToRemove={foodToRemove}
-            mealWeekPlan={mealWeekPlan}
-          ></Modal>
-        ) : null}
-      </View>
-    </ScrollView>
+      </ScrollView>
+      {isModalDisplay ? (
+        <Modal
+          style={[Styles.modal]}
+          foodToRemove={foodToRemove}
+          mealWeekPlan={mealWeekPlan}
+        ></Modal>
+      ) : null}
+    </View>
   );
 }
 
@@ -225,13 +239,10 @@ function capitalizeFirstChar(str) {
 }
 
 const Styles = StyleSheet.create({
-  scrollContainer: {
-    position: "relative",
-    height: 10,
-  },
   container: {
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#212121",
   },
   touchContainer: {
     alignItems: "center",
@@ -259,28 +270,84 @@ const Styles = StyleSheet.create({
   },
 
   dayContainer: {
-    alignItems: "center",
-    justifyContent: "center",
+    marginTop: 20,
+    flexDirection: "column", // Updated this line
+    alignItems: "left",
+    justifyContent: "flex-start",
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
+  },
+  dayNameContainer: {
+    alignSelf: "center",
   },
   dayContent: {
-    flexDirection: "row",
+    borderRadius: "25px",
+    marginTop: 40,
+    marginLeft: 20,
+    flexDirection: "column",
+    alignItems: "flex-start",
     justifyContent: "space-between",
-    padding: 10,
+    height: "60%",
+    width: "90%",
+    backgroundColor: "#b7bdb7",
   },
-
+  picture: {
+    borderRadius: 5,
+    width: 80,
+    height: 80,
+    resizeMode: "center",
+    marginLeft: 10,
+    marginBottom: 5,
+    marginTop: 5,
+  },
+  dayName: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "green",
+  },
+  caloriesText: {
+    marginTop: 5,
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#12db12",
+  },
   mealContainer: {
     marginHorizontal: 5,
-    width: "20%",
+    marginTop: 10,
+    width: "25%",
     justifyContent: "space-between",
   },
+  imageFoodContainer: {},
   mealContent: {
-    flexDirection: "column",
-    flexWrap: "nowrap",
+    width: "100%",
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
   mealStats: { position: "relative", bottom: 0 },
 
   idText: { fontSize: 10 },
-  mealText: { fontSize: 12 },
-  foodText: { fontSize: 8, marginBottom: 5 },
+  mealText: {
+    fontSize: 15,
+    fontWeight: "bold",
+  },
+  foodText: {
+    fontSize: 8,
+    marginBottom: 5,
+  },
   statText: { fontSize: 10, fontWeight: "bold" },
+  addButton: {
+    position: "absolute",
+    bottom: 0,
+    width: "10%",
+    alignSelf: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    backgroundColor: "#1c211d",
+    borderRadius: 10,
+  },
+  plusText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "green",
+  },
 });

@@ -121,6 +121,7 @@ export default function FoodDatabse({ navigation, route }) {
             ...selection,
             _id: item._id,
             name: item.name,
+            picture: item.picture,
             calories: item.calories,
           });
         }}
@@ -160,9 +161,12 @@ export default function FoodDatabse({ navigation, route }) {
       const food = new Food();
       food._id = selection["_id"];
       food.name = selection["name"];
+      food.picture = selection["picture"];
       food.calories = selection["calories"];
       food.quantity = 1;
       weekData.days[dayForUpdate][pickerSelectedValue].push(food);
+
+      console.log("Food form database", selection);
     }
     //write modification in local storage
     await AsyncStorage.setItem(
@@ -263,14 +267,6 @@ const Styles = StyleSheet.create({
     alignContent: "center",
     borderRadius: 10,
   },
-  addButton: {
-    width: "10%",
-    height: "30%",
-    backgroundColor: "#1c211d",
-    borderRadius: 10,
-    marginTop: 40,
-    marginRight: 28,
-  },
   searchButtonText: {
     textAlign: "center",
     textAlignVertical: "center",
@@ -318,6 +314,14 @@ const Styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     padding: 10,
+  },
+  addButton: {
+    width: "10%",
+    height: "30%",
+    backgroundColor: "#1c211d",
+    borderRadius: 10,
+    marginTop: 40,
+    marginRight: 28,
   },
   plusText: {
     marginLeft: 11,

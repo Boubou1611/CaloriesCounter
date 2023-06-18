@@ -25,6 +25,7 @@ export class Food {
   constructor() {
     this._id = [];
     this.name = [];
+    this.picture = [];
     this.calories = [];
     this.quantity = [];
   }
