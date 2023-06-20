@@ -17,7 +17,7 @@ const Goals = [
   { name: 'Weight Gain', value: 'weight_gain' },
 ];
 
-const GenderChoices = ['Male', 'Female', 'Other'];
+const GenderChoices = ['Male', 'Female'];
 
 const HealthGoals = () => {
   const [name, setName] = useState('');
