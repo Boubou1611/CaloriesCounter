@@ -70,8 +70,8 @@ export default function FoodDatabse({ navigation, route }) {
         `https://trackapi.nutritionix.com/v2/search/instant?query=${item}`,
         {
           headers: {
-            "x-app-id": "b9973180",
-            "x-app-key": "8465f81a70cc42f106e0aa2358d0d446",
+            "x-app-id": "dae115c7",
+            "x-app-key": "f3d4271d39b11a7f8f074ef780c9ace3",
           },
         }
       );
