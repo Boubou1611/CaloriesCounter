@@ -32,6 +32,8 @@ const HealthGoals = () => {
   const [showGoalPicker, setShowGoalPicker] = useState(false);
   const [isAgreed, setIsAgreed] = useState(false);
   const [bmr, setBMR] = useState(null);
+  const [calories, setCalories] = useState(null);
+
 
   const handleGenderPickerPress = () => {
     setShowGenderPicker(true);
@@ -95,6 +97,51 @@ const HealthGoals = () => {
   
     return adjustedBMR;
   };
+
+
+  const calculateCalories = () => {
+    const bmr = calculateBMR();
+    if (bmr !== null) {
+      let adjustedBMR = 0;
+      switch (activityLevel) {
+        case 'sedentary':
+          adjustedBMR = bmr * 1.2;
+          break;
+        case 'light_exercise':
+          adjustedBMR = bmr * 1.375;
+          break;
+        case 'moderate_exercise':
+          adjustedBMR = bmr * 1.55;
+          break;
+        case 'heavy_exercise':
+          adjustedBMR = bmr * 1.725;
+          break;
+        case 'extra_active':
+          adjustedBMR = bmr * 1.9;
+          break;
+        default:
+          adjustedBMR = bmr;
+          break;
+      }
+
+      let adjustedCalories = adjustedBMR;
+      switch (goal) {
+        case 'weight_loss':
+          adjustedCalories = adjustedBMR * 0.9; // Subtract 10% for weight loss
+          break;
+        case 'weight_gain':
+          adjustedCalories = adjustedBMR * 1.1; // Add 10% for weight gain
+          break;
+        default:
+          break;
+      }
+
+      return adjustedCalories;
+    }
+    return null;
+  };
+
+
   const handleSubmit = () => {
     
     if (!name || name.length < 3) {
@@ -117,6 +164,9 @@ const HealthGoals = () => {
       if (calculatedBMR !== null) {
         setBMR(calculatedBMR);
       }
+    const calculatedCalories = calculateCalories();
+      setCalories(calculatedCalories);
+  
     Alert.alert("Form Submitted", message);
   };
 
@@ -230,11 +280,16 @@ const HealthGoals = () => {
         I confirm that my informations are correct
       </Text>
      </View>
-     {bmr !== null && (
+     {/* {bmr !== null && (
         <Text style={styles.bmrText}>
           Your BMR is: {bmr.toFixed(2)} calories per day.
         </Text>
-      )}
+      )} */}
+      {calories !== null && (
+          <Text style={styles.resultText}>
+            Total Caloric Intake: {calories.toFixed(2)} calories per day
+          </Text>
+        )}
     </View>
     
   );
@@ -304,6 +359,12 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   bmrText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: 'white',
+    fontWeight: "bold",
+  },
+  resultText: {
     marginTop: 20,
     fontSize: 16,
     color: 'white',
