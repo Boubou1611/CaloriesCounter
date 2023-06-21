@@ -3,6 +3,7 @@ import { View, TextInput, Button, StyleSheet, Modal, TouchableWithoutFeedback, T
 import { Picker } from "@react-native-picker/picker";
 import {Checkbox} from "expo-checkbox";
 
+// Different activity levels
 const ActivityLevels = [
   { name: 'Sedentary', value: 'sedentary' },
   { name: 'Light Exercise', value: 'light_exercise' },
@@ -10,15 +11,17 @@ const ActivityLevels = [
   { name: 'Heavy Exercise', value: 'heavy_exercise' },
   { name: 'Extra Active', value: 'extra_active' },
 ];
-
+// Different goals
 const Goals = [
   { name: 'Weight Loss', value: 'weight_loss' },
   { name: 'Weight Maintenance', value: 'weight_maintenance' },
   { name: 'Weight Gain', value: 'weight_gain' },
 ];
 
+// 2 gender choices, we used to add "Other" but removed because we can't calculate BMR for "Other"
 const GenderChoices = ['Male', 'Female'];
 
+/************ Consts ***************/ 
 const HealthGoals = () => {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
@@ -33,8 +36,9 @@ const HealthGoals = () => {
   const [isAgreed, setIsAgreed] = useState(false);
   const [bmr, setBMR] = useState(null);
   const [calories, setCalories] = useState(null);
+/************ Const end ***************/ 
 
-
+/*************** Handlers **************/
   const handleGenderPickerPress = () => {
     setShowGenderPicker(true);
   };
@@ -65,6 +69,9 @@ const HealthGoals = () => {
   const handleAgreedCheckboxChange = (value) => {
     setIsAgreed(value);
   };
+/*************** Handlers end **************/
+
+  // Function to calculate BMR, and updated to adjust the BMR with the activity level
   const calculateBMR = () => {
     let bmr = 0;
     if (gender === 'Male') {
@@ -98,7 +105,7 @@ const HealthGoals = () => {
     return adjustedBMR;
   };
 
-
+// Function that calculate the Calories Intake with the BMR
   const calculateCalories = () => {
     const bmr = calculateBMR();
     if (bmr !== null) {
@@ -127,10 +134,10 @@ const HealthGoals = () => {
       let adjustedCalories = adjustedBMR;
       switch (goal) {
         case 'weight_loss':
-          adjustedCalories = adjustedBMR * 0.9; // Subtract 10% for weight loss
+          adjustedCalories = adjustedBMR * 0.9; 
           break;
         case 'weight_gain':
-          adjustedCalories = adjustedBMR * 1.1; // Add 10% for weight gain
+          adjustedCalories = adjustedBMR * 1.1; 
           break;
         default:
           break;
@@ -142,6 +149,7 @@ const HealthGoals = () => {
   };
 
 
+  // Function that threats the informations so that it can validate every parameter
   const handleSubmit = () => {
     
     if (!name || name.length < 3) {
@@ -152,25 +160,38 @@ const HealthGoals = () => {
       Alert.alert("Error", "You must be at least 15");
       return;
     }
+    if (!height) {
+      Alert.alert("Error", "You must enter your height");
+      return;
+    }
+    if (!weight) {
+      Alert.alert("Error", "You must enter your weight");
+      return;
+    }
     if (!isAgreed) {
       Alert.alert("Error", "You must agree to the rules before submitting");
       return;
     }
   
-    // If all validations pass, display the form information
+    // If all validations pass, prepare the message to display
     const message = `Name: ${name}\nAge: ${age}\nHeight ${height}\nWeight ${weight}
     \nGender ${gender}\nActivity Level: ${activityLevel}\nGoal: ${goal}`;
+    //Calculate BMR and calories
     const calculatedBMR = calculateBMR();
       if (calculatedBMR !== null) {
         setBMR(calculatedBMR);
       }
     const calculatedCalories = calculateCalories();
       setCalories(calculatedCalories);
-  
+
+    // Display the message to the user
     Alert.alert("Form Submitted", message);
   };
 
+/******************** Return ********************/
+
   return (
+    //Touch outside the keyboard to dismiss it
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
         <TextInput
@@ -178,8 +199,9 @@ const HealthGoals = () => {
           placeholder="Name"
           value={name}
           onChangeText={setName}
-        />
-  
+        /> 
+        {/* Text box for the name */}
+
         <View style={styles.row}>
           <View style={styles.inputContainer}>
             <TextInput
@@ -190,6 +212,7 @@ const HealthGoals = () => {
               keyboardType="numeric"
             />
           </View>
+        {/* Numeric text box for the Height */}
   
           <View style={styles.inputContainer}>
             <TextInput
@@ -201,13 +224,15 @@ const HealthGoals = () => {
             />
           </View>
         </View>
-  
+        {/* Numeric text box for the Weight */}
+        
         <TouchableWithoutFeedback onPress={handleGenderPickerPress}>
           <View style={styles.pickerContainer}>
             <Text style={styles.pickerText}>{gender}</Text>
           </View>
         </TouchableWithoutFeedback>
-  
+        {/* Picker "trigger" so the picker is not always open */}
+
         <TextInput
           placeholder="Age"
           value={age}
@@ -215,6 +240,7 @@ const HealthGoals = () => {
           keyboardType="numeric"
           style={styles.input}
         />
+        {/* Numeric text box for the Age */}
   
         <TouchableWithoutFeedback onPress={handleActivityLevelPickerPress}>
           <View style={styles.pickerContainer}>
@@ -223,7 +249,8 @@ const HealthGoals = () => {
             </Text>
           </View>
         </TouchableWithoutFeedback>
-  
+        {/* Picker "trigger" so the picker is not always open */}
+
         <TouchableWithoutFeedback onPress={handleGoalPickerPress}>
           <View style={styles.pickerContainer}>
             <Text style={styles.pickerText}>
@@ -231,9 +258,11 @@ const HealthGoals = () => {
             </Text>
           </View>
         </TouchableWithoutFeedback>
-  
+        {/* Picker "trigger" so the picker is not always open */}
+
         <Button title="Submit" onPress={handleSubmit} />
-  
+        {/* Button to submit the informations */}
+
         <Modal visible={showGenderPicker} animationType="slide" transparent>
           <View style={styles.modalContainer}>
             <Picker
@@ -247,6 +276,7 @@ const HealthGoals = () => {
             </Picker>
           </View>
         </Modal>
+        {/* Picker for the gender choice */}
   
         <Modal visible={showActivityLevelPicker} animationType="slide" transparent>
           <View style={styles.modalContainer}>
@@ -261,7 +291,7 @@ const HealthGoals = () => {
             </Picker>
           </View>
         </Modal>
-  
+        {/* Picker for the activity level */}
         <Modal visible={showGoalPicker} animationType="slide" transparent>
           <View style={styles.modalContainer}>
             <Picker
@@ -275,25 +305,28 @@ const HealthGoals = () => {
             </Picker>
           </View>
         </Modal>
-  
+        {/* Picker for the goal */}
         <View style={styles.switchContainer}>
           <Checkbox value={isAgreed} onValueChange={handleAgreedCheckboxChange} />
           <Text style={styles.switchText}>
             I confirm that my information is correct
           </Text>
         </View>
-  
+        {/* Checkbox of confirmation */}
         {calories !== null && (
           <Text style={styles.resultText}>
             Total Caloric Intake: {calories.toFixed(2)} calories per day
           </Text>
+        // Calories intake display 
         )}
       </View>
     </TouchableWithoutFeedback>
   );
   
 };
+/******************** Return end *******************/
 
+/**************** Styles ********************/
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -370,5 +403,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+/**************** Styles end ********************/
 
 export default HealthGoals;
