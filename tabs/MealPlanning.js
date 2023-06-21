@@ -414,6 +414,7 @@ const Styles = StyleSheet.create({
   },
 
   dayNameContainer: {
+    flex: 0,
     marginBottom: 5,
   },
   dayContent: {
